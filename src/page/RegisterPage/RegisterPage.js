@@ -35,6 +35,7 @@ const RegisterPage = () => {
     }
     setPasswordError("");
     setPolicyError(false);
+    //API 호출
     dispatch(registerUser({ name, email, password, navigate }));
   };
 
