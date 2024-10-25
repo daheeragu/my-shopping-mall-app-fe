@@ -17,7 +17,7 @@ export const loginWithGoogle = createAsyncThunk(
 export const logout = () => (dispatch) => {};
 // 회원가입
 export const registerUser = createAsyncThunk(
-  "user/register",
+  "user/registerUser",
   async (
     { email, name, password, navigate },
     { dispatch, rejectWithValue }
