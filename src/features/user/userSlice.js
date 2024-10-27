@@ -28,8 +28,11 @@ export const loginWithGoogle = createAsyncThunk(
   "user/loginWithGoogle",
   async (token, { rejectWithValue }) => {}
 );
-
-export const logout = () => (dispatch) => {};
+//로그 아웃
+export const logout = () => (dispatch) => {
+  sessionStorage.removeItem("token");
+  dispatch(userSlice.actions.logout());
+};
 // 회원가입
 export const registerUser = createAsyncThunk(
   "user/registerUser",
@@ -90,6 +93,10 @@ const userSlice = createSlice({
     clearErrors: (state) => {
       state.loginError = null;
       state.registrationError = null;
+    },
+    logout: (state) => {
+      state.user = null;
+      state.loginError = null;
     },
   },
   extraReducers: (builder) => {
