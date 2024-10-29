@@ -37,9 +37,17 @@ const AdminProductPage = () => {
   ];
 
   //상품리스트 가져오기 (url쿼리 맞춰서)
-
+  useEffect(() => {
+    dispatch(getProductList({ ...searchQuery }));
+  }, [query]);
   useEffect(() => {
     //검색어나 페이지가 바뀌면 url바꿔주기 (검색어또는 페이지가 바뀜 => url 바꿔줌=> url쿼리 읽어옴=> 이 쿼리값 맞춰서  상품리스트 가져오기)
+    if (searchQuery.name === "") {
+      delete searchQuery.name;
+    }
+    const params = new URLSearchParams(searchQuery);
+    const query = params.toString();
+    navigate("?" + query);
   }, [searchQuery]);
 
   const deleteItem = (id) => {
@@ -62,6 +70,10 @@ const AdminProductPage = () => {
     //  쿼리에 페이지값 바꿔주기
   };
 
+  // 검색 기능
+  // searchBox에서 검색어를 읽어온다 => Enter를 치면 searchQuery객체가 업데이트가 됨 (name : XXX)
+  // searchQuery 객체 안의 아이템 기준으로 url를 새로 생성해서 호출 ex] &name = XXX
+  // 생성된 url쿼리 읽어오기 => 그 url쿼리 기준으로 EB에 검색 조건과 함께 호출
   return (
     <div className="locate-center">
       <Container>
@@ -79,7 +91,7 @@ const AdminProductPage = () => {
 
         <ProductTable
           header={tableHeader}
-          data=""
+          data={productList}
           deleteItem={deleteItem}
           openEditForm={openEditForm}
         />
