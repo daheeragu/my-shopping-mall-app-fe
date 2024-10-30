@@ -29,12 +29,14 @@ const Navbar = ({ user }) => {
   ];
   let [width, setWidth] = useState(0);
   let navigate = useNavigate();
+  const page = 1;
   const onCheckEnter = (event) => {
     if (event.key === "Enter") {
       if (event.target.value === "") {
-        return navigate("/");
+        return navigate(`?page=${page}`);
+        //return navigate("/");
       }
-      navigate(`?name=${event.target.value}`);
+      navigate(`?page=${page}&name=${event.target.value}`);
     }
   };
   // 로그아웃
