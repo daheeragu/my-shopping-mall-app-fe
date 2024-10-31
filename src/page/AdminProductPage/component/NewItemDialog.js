@@ -58,8 +58,12 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
   }, [showDialog]);
 
   const handleClose = () => {
-    //모든걸 초기화시키고;
+    //모든걸 초기화시키고
+    setFormData({ ...InitialFormData });
+    setStock([]);
+    dispatch(clearError());
     // 다이얼로그 닫아주기
+    setShowDialog(false);
   };
 
   const handleSubmit = (event) => {
@@ -78,6 +82,9 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
       dispatch(createProduct({ ...formData, stock: totalStock }));
     } else {
       // 상품 수정하기
+      dispatch(
+        editProduct({ ...formData, stock: totalStock, id: selectedProduct._id })
+      );
     }
   };
 

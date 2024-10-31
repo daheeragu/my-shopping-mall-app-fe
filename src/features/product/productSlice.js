@@ -8,7 +8,6 @@ export const getProductList = createAsyncThunk(
   async (query, { rejectWithValue }) => {
     try {
       const response = await api.get("/product", { params: { ...query } });
-      console.log("rrrrrrrr", response);
       if (response.status !== 200) throw new Error(response.error);
       return response.data;
     } catch (error) {
@@ -19,7 +18,15 @@ export const getProductList = createAsyncThunk(
 
 export const getProductDetail = createAsyncThunk(
   "products/getProductDetail",
-  async (id, { rejectWithValue }) => {}
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/product/${id}`);
+      if (response.status !== 200) throw new Error(response.error);
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
 );
 
 export const createProduct = createAsyncThunk(
@@ -31,6 +38,7 @@ export const createProduct = createAsyncThunk(
       dispatch(
         showToastMessage({ message: "상품 생성 완료", status: "success" })
       );
+      dispatch(getProductList({ page: 1 }));
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -40,12 +48,32 @@ export const createProduct = createAsyncThunk(
 
 export const deleteProduct = createAsyncThunk(
   "products/deleteProduct",
-  async (id, { dispatch, rejectWithValue }) => {}
+  async (id, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await api.delete(`/product/${id}`);
+      if (response.status !== 200) throw new Error(response.error);
+      dispatch(
+        showToastMessage({ message: "상품 삭제 완료", status: "success" })
+      );
+      dispatch(getProductList({ page: 1 }));
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
 );
 
 export const editProduct = createAsyncThunk(
   "products/editProduct",
-  async ({ id, ...formData }, { dispatch, rejectWithValue }) => {}
+  async ({ id, ...formData }, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await api.put(`/product/${id}`, formData);
+      if (response.status !== 200) throw new Error(response.error);
+      dispatch(getProductList({ page: 1 }));
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
 );
 
 // 슬라이스 생성
@@ -96,6 +124,42 @@ const productSlice = createSlice({
         state.totalPageNum = action.payload.totalPageNum;
       })
       .addCase(getProductList.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(editProduct.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(editProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = "";
+        state.success = true; // 상품 수정을 성공했으면 다이얼로그를 닫고, 실패? 실패 메세지를 다이얼로그에 보여주고, 닫지 않음
+      })
+      .addCase(editProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.success = false;
+      })
+      .addCase(deleteProduct.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = "";
+      })
+      .addCase(deleteProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(getProductDetail.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getProductDetail.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = "";
+        state.selectedProduct = action.payload;
+      })
+      .addCase(getProductDetail.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
