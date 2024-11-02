@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-regular-svg-icons";
 import {
@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../features/user/userSlice";
-
+import { getCartQty } from "../../features/cart/cartSlice";
 const Navbar = ({ user }) => {
   const dispatch = useDispatch();
   const { cartItemCount } = useSelector((state) => state.cart);
@@ -30,6 +30,12 @@ const Navbar = ({ user }) => {
   let [width, setWidth] = useState(0);
   let navigate = useNavigate();
   const page = 1;
+  //로그인 후, 유저의 카트에 담긴 상품 수량 가져오기
+  useEffect(() => {
+    if (user) {
+      dispatch(getCartQty());
+    }
+  }, [user]);
   const onCheckEnter = (event) => {
     if (event.key === "Enter") {
       if (event.target.value === "") {
