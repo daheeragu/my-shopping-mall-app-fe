@@ -68,7 +68,7 @@ const AdminOrderPage = () => {
           <SearchBox
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
-            placeholder="오더번호"
+            placeholder="주문번호를 입력하세요"
             field="ordernum"
           />
         </div>

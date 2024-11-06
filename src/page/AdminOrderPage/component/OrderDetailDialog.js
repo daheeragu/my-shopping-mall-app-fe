@@ -4,17 +4,22 @@ import { useDispatch, useSelector } from "react-redux";
 import { ORDER_STATUS } from "../../../constants/order.constants";
 import { currencyFormat } from "../../../utils/number";
 import { updateOrder } from "../../../features/order/orderSlice";
+import { useSearchParams } from "react-router-dom";
 
 const OrderDetailDialog = ({ open, handleClose }) => {
   const selectedOrder = useSelector((state) => state.order.selectedOrder);
   const [orderStatus, setOrderStatus] = useState(selectedOrder.status);
   const dispatch = useDispatch();
+  const [query] = useSearchParams();
+  let page = query.get("page");
 
   const handleStatusChange = (event) => {
     setOrderStatus(event.target.value);
   };
   const submitStatus = () => {
-    dispatch(updateOrder({ id: selectedOrder._id, status: orderStatus }));
+    dispatch(
+      updateOrder({ id: selectedOrder._id, status: orderStatus, page: page })
+    );
     handleClose();
   };
 
@@ -27,14 +32,14 @@ const OrderDetailDialog = ({ open, handleClose }) => {
         <Modal.Title>Order Detail</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>예약번호: {selectedOrder.orderNum}</p>
+        <p>주문번호: {selectedOrder.orderNum}</p>
         <p>주문날짜: {selectedOrder.createdAt.slice(0, 10)}</p>
         <p>이메일: {selectedOrder.userId.email}</p>
         <p>
-          주소:{selectedOrder.shipTo.address + " " + selectedOrder.shipTo.city}
+          주소: {selectedOrder.shipTo.address + " " + selectedOrder.shipTo.city}
         </p>
         <p>
-          연락처:
+          연락처:{" "}
           {`${
             selectedOrder.contact.firstName + selectedOrder.contact.lastName
           } ${selectedOrder.contact.contact}`}

@@ -4,7 +4,7 @@ import "../style/common.style.css";
 const Spinner = () => {
   return (
     <div className="loading-spinner">
-      <img src="/image/Spinner.png" alt="spinner" />
+      <img src="/image/spinner.png" alt="spinner" />
     </div>
   );
 };

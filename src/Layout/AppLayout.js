@@ -7,6 +7,7 @@ import Navbar from "../common/component/Navbar";
 import ToastMessage from "../common/component/ToastMessage";
 import { loginWithToken } from "../features/user/userSlice";
 import { getCartQty } from "../features/cart/cartSlice";
+import "./style/applayout.style.css";
 
 const AppLayout = ({ children }) => {
   const location = useLocation();
@@ -22,7 +23,7 @@ const AppLayout = ({ children }) => {
     }
   }, [user]);
   return (
-    <div>
+    <div className="app-layout">
       <ToastMessage />
       {location.pathname.includes("admin") ? (
         <Row className="vh-100">

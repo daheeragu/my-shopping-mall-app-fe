@@ -1,0 +1,39 @@
+.status-card {
+  background-color: white;
+  width: 800px; /* 원하는 고정 너비 */
+  padding: 10px;
+  max-width: 100%; /* 부모 요소보다 넓어지지 않도록 설정 */
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  margin-bottom: 20px;
+}
+.status-card:hover {
+  background-color: rgba(238, 30, 30, 0.148);
+}
+.vertical-middle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.radio-check {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+.wish-info {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.wish-delete-btn {
+  text-align: center;
+  font-size: 12px;
+  background-color: white;
+  border-radius: 5px;
+}
+
+.wish-delete-btn:hover {
+  background-color: black;
+  color: white;
+  font-weight: bolder;
+}
