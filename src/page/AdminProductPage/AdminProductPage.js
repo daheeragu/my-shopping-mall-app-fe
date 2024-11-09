@@ -10,13 +10,16 @@ import {
   getProductList,
   deleteProduct,
   setSelectedProduct,
+  clearCreateSuccess,
 } from "../../features/product/productSlice";
 
 const AdminProductPage = () => {
   const navigate = useNavigate();
   const [query] = useSearchParams();
   const dispatch = useDispatch();
-  const { productList, totalPageNum } = useSelector((state) => state.product);
+  const { productList, totalPageNum, createProductSuccess } = useSelector(
+    (state) => state.product
+  );
   const [showDialog, setShowDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState({
     page: query.get("page") || 1,
@@ -36,10 +39,30 @@ const AdminProductPage = () => {
     "",
   ];
 
+  // URL 쿼리가 변경될 때 `searchQuery`를 업데이트
+  useEffect(() => {
+    setSearchQuery({
+      page: query.get("page") || 1,
+      name: query.get("name") || "",
+    });
+  }, [query]);
+
+  // 상품 추가 시, 상품 추가한 페이지로 이동
+  useEffect(() => {
+    if (createProductSuccess) {
+      setSearchQuery((prevQuery) => ({
+        ...prevQuery,
+        page: totalPageNum,
+      }));
+      dispatch(clearCreateSuccess());
+    }
+  }, [createProductSuccess, totalPageNum]);
+
   //상품리스트 가져오기 (url쿼리 맞춰서)
   useEffect(() => {
     dispatch(getProductList({ ...searchQuery }));
   }, [query]);
+
   useEffect(() => {
     //검색어나 페이지가 바뀌면 url바꿔주기 (검색어또는 페이지가 바뀜 => url 바꿔줌=> url쿼리 읽어옴=> 이 쿼리값 맞춰서  상품리스트 가져오기)
     if (searchQuery.name === "") {
@@ -51,8 +74,8 @@ const AdminProductPage = () => {
   }, [searchQuery]);
 
   const deleteItem = (id) => {
-    //아이템 삭제하기
-    dispatch(deleteProduct(id));
+    const currentPage = searchQuery.page;
+    dispatch(deleteProduct({ id, currentPage }));
   };
 
   const openEditForm = (product) => {
@@ -127,6 +150,7 @@ const AdminProductPage = () => {
         mode={mode}
         showDialog={showDialog}
         setShowDialog={setShowDialog}
+        searchQuery={searchQuery}
       />
     </div>
   );

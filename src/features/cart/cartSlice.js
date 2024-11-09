@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../utils/api";
 import { showToastMessage } from "../common/uiSlice";
+import { logout } from "../user/userSlice";
 
 const initialState = {
   loading: false,
@@ -17,7 +18,6 @@ export const addToCart = createAsyncThunk(
   async ({ id, size }, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.post("/cart", { productId: id, size, qty: 1 });
-      if (response.status !== 200) throw new Error(response.error);
       dispatch(
         showToastMessage({
           message: "카트에 상품이 추가 되었습니다.",
@@ -42,7 +42,6 @@ export const getCartList = createAsyncThunk(
   async (_, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.get("/cart");
-      if (response.status !== 200) throw new Error(response.error);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -55,7 +54,6 @@ export const deleteCartItem = createAsyncThunk(
   async (id, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.delete(`/cart/${id}`);
-      if (response.status !== 200) throw new Error(response.error);
       dispatch(
         showToastMessage({
           message: "카트 안 상품 삭제 완료",
@@ -75,7 +73,6 @@ export const updateQty = createAsyncThunk(
   async ({ id, value }, { rejectWithValue }) => {
     try {
       const response = await api.put(`cart/${id}`, { qty: value });
-      if (response.status !== 200) throw new Error(response.error);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -88,7 +85,6 @@ export const getCartQty = createAsyncThunk(
   async (_, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.get("/cart/qty");
-      if (response.status !== 200) throw new Error(response.error);
       return response.data.cartItemQty; //TODO
     } catch (error) {
       return rejectWithValue(error.message);
@@ -174,6 +170,11 @@ const cartSlice = createSlice({
       .addCase(getCartQty.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(logout.fulfilled, (state) => {
+        // 로그아웃 시 카트 초기화
+        state.cartList = [];
+        state.cartItemCount = 0;
       });
   },
 });

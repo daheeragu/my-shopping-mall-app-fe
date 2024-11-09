@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as farHeartOutline } from "@fortawesome/free-regular-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
-import "./ProductCard.style.css";
+import "./style/productCard.style.css";
 import {
   addToWishlist,
   deleteFromWishlist,
@@ -23,7 +23,7 @@ const ProductCard = ({ item }) => {
   console.log("wishlist", wishlist);
   console.log("item", item);
   useEffect(() => {
-    if (user) {
+    if (user && wishlist.length > 0) {
       dispatch(getWishlist()); // 로그인된 유저일 때만 위시리스트 불러오기
     }
   }, [user, dispatch]);
@@ -37,6 +37,13 @@ const ProductCard = ({ item }) => {
       setWish(isWished);
     }
   }, [wishlist, item._id]);
+
+  // 유저가 없으면 좋아요 표시 모두 초기화
+  useEffect(() => {
+    if (!user) {
+      setWish(false);
+    }
+  }, []);
 
   const showProduct = (id) => {
     navigate(`/product/${id}`);
@@ -65,7 +72,11 @@ const ProductCard = ({ item }) => {
   return (
     <div className="card" onClick={() => showProduct(item._id)}>
       <img src={item?.image} alt={item?.image} />
-      <button className="wishlist-btn" onClick={toggleWish}>
+      <button
+        className="wishlist-btn"
+        onClick={toggleWish}
+        onTouchStart={(e) => e.stopPropagation()}
+      >
         <FontAwesomeIcon
           icon={wish ? faHeart : farHeartOutline}
           size="lg"

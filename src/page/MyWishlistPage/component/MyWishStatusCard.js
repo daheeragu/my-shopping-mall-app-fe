@@ -5,26 +5,28 @@ import { currencyFormat } from "../../../utils/number";
 
 const MyWishStatusCard = ({ wishlistItem }) => {
   return (
-    <div>
-      <Row className="status-card">
-        <Col className="radio-check" xs={1}>
-          <Form.Check ria-label="option 1" />
+    <div className="status-card">
+      <Row className="align-items-center">
+        <Col xs={1} className="radio-check">
+          <Form.Check aria-label="option 1" />
         </Col>
-        <Col xs={2}>
+        <Col xs={3} md={2} className="image-col">
           <img
             src={wishlistItem?.image}
-            alt={wishlistItem?.image}
-            height={96}
+            alt={wishlistItem?.productId?.name || "상품 이미지"}
+            className="wishlist-image"
           />
         </Col>
-        <Col xs={7} className="wish-info">
+        <Col xs={6} md={7} className="wish-info">
           <div>
-            <strong>상품명: {wishlistItem.productId.name}</strong>
+            <strong>
+              상품명: {wishlistItem?.productId?.name || "상품 이름"}
+            </strong>
           </div>
-          <div>₩ {currencyFormat(wishlistItem.price)}</div>
+          <div>₩ {currencyFormat(wishlistItem?.price)}</div>
         </Col>
-        <Col md={2} className="vertical-middle">
-          <button className="wish-delelte-btn">삭제</button>
+        <Col xs={2} className="vertical-middle text-end">
+          <button className="wish-delete-btn">삭제</button>
         </Col>
       </Row>
     </div>

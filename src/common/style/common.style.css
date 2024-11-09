@@ -47,3 +47,13 @@
   justify-content: center;
   align-items: center;
 }
+
+.filteredByPrice-container {
+  width: 300px;
+  margin-bottom: 60px;
+}
+.label-box {
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #5a5a5a;
+}

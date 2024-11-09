@@ -37,10 +37,19 @@ export const loginWithGoogle = createAsyncThunk(
   }
 );
 //로그 아웃
-export const logout = () => (dispatch) => {
-  sessionStorage.removeItem("token");
-  dispatch(userSlice.actions.logout());
-};
+// export const logout = () => (dispatch) => {
+//   sessionStorage.removeItem("token");
+//   dispatch(userSlice.actions.logout());
+// };
+
+// 로그아웃 액션
+export const logout = createAsyncThunk(
+  "user/logout",
+  async (_, { dispatch }) => {
+    sessionStorage.removeItem("token");
+    dispatch(userSlice.actions.logout()); // 유저 정보 초기화
+  }
+);
 // 회원가입
 export const registerUser = createAsyncThunk(
   "user/registerUser",

@@ -4,10 +4,12 @@ import { useDispatch, useSelector } from "react-redux";
 import CloudinaryUploadWidget from "../../../utils/CloudinaryUploadWidget";
 import { CATEGORY, STATUS, SIZE } from "../../../constants/product.constants";
 import "../style/adminProduct.style.css";
+import { useSearchParams } from "react-router-dom";
 import {
   clearError,
   createProduct,
   editProduct,
+  clearCreateSuccess,
 } from "../../../features/product/productSlice";
 import { image } from "@cloudinary/url-gen/qualifiers/source";
 
@@ -22,22 +24,30 @@ const InitialFormData = {
   price: 0,
 };
 
-const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
-  const { error, success, selectedProduct } = useSelector(
-    (state) => state.product
-  );
+const NewItemDialog = ({ mode, showDialog, setShowDialog, searchQuery }) => {
+  const {
+    error,
+    success,
+    selectedProduct,
+    createProductSuccess,
+    totalPageNum,
+  } = useSelector((state) => state.product);
   const [formData, setFormData] = useState(
     mode === "new" ? { ...InitialFormData } : selectedProduct
   );
   const [stock, setStock] = useState([]);
   const dispatch = useDispatch();
   const [stockError, setStockError] = useState(false);
+  const [query, setSearchParams] = useSearchParams();
 
   useEffect(() => {
-    if (success) setShowDialog(false);
+    if (success) {
+      handleClose(); // 성공 시 다이얼로그 닫기
+    }
   }, [success]);
 
   useEffect(() => {
+    // 비동기 액션의 성공여부를 초기화 시킴
     if (error || !success) {
       dispatch(clearError());
     }
@@ -56,6 +66,13 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
       }
     }
   }, [showDialog]);
+
+  useEffect(() => {
+    if (createProductSuccess) {
+      // 페이지 번호를 마지막 페이지로 설정
+      setSearchParams({ page: totalPageNum });
+    }
+  }, [createProductSuccess, totalPageNum, setSearchParams]);
 
   const handleClose = () => {
     //모든걸 초기화시키고
@@ -80,11 +97,21 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
     // [['M',2]] 에서 {M:2}로
     if (mode === "new") {
       //새 상품 만들기
-      dispatch(createProduct({ ...formData, stock: totalStock }));
+      dispatch(
+        createProduct({
+          ...formData,
+          stock: totalStock,
+        })
+      );
     } else {
       // 상품 수정하기
       dispatch(
-        editProduct({ ...formData, stock: totalStock, id: selectedProduct._id })
+        editProduct({
+          ...formData,
+          stock: totalStock,
+          id: selectedProduct._id,
+          page: searchQuery.page,
+        })
       );
     }
   };

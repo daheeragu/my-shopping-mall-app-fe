@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../utils/api";
 import { showToastMessage } from "../common/uiSlice";
+import { logout } from "../user/userSlice";
 
 const initialState = {
   loading: false,
@@ -14,7 +15,6 @@ export const addToWishlist = createAsyncThunk(
   async ({ item }, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.post("/wishlist", { item });
-      if (response.status !== 200) throw new Error(response.error);
       // TODO 관심 상품 리스트 업데이트
       dispatch(getWishlist());
       return response.data.data;
@@ -30,7 +30,6 @@ export const deleteFromWishlist = createAsyncThunk(
   async ({ id }, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.delete(`/wishlist/${id}`);
-      if (response.status !== 200) throw new Error(response.error);
       // TODO 관심 상품 리스트 업데이트
       dispatch(getWishlist());
     } catch (error) {
@@ -44,7 +43,6 @@ export const getWishlist = createAsyncThunk(
   async (_, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.get("/wishlist");
-      if (response.status !== 200) throw new Error(response.error);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -85,6 +83,10 @@ const wishlistSlice = createSlice({
       .addCase(getWishlist.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(logout.fulfilled, (state) => {
+        // 로그아웃 시 카트 초기화
+        state.wishlist = [];
       });
   },
 });

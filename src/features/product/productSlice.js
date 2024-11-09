@@ -8,7 +8,6 @@ export const getProductList = createAsyncThunk(
   async (query, { rejectWithValue }) => {
     try {
       const response = await api.get("/product", { params: { ...query } });
-      if (response.status !== 200) throw new Error(response.error);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -21,7 +20,6 @@ export const getProductDetail = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await api.get(`/product/${id}`);
-      if (response.status !== 200) throw new Error(response.error);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -34,12 +32,12 @@ export const createProduct = createAsyncThunk(
   async (formData, { dispatch, rejectWithValue }) => {
     try {
       const response = await api.post("/product", formData);
-      if (response.status !== 200) throw new Error(response.error);
+      const totalPageNum = response.data.totalPageNum;
       dispatch(
         showToastMessage({ message: "상품 생성 완료", status: "success" })
       );
-      dispatch(getProductList({ page: 1 }));
-      return response.data.data;
+      dispatch(getProductList({ page: totalPageNum }));
+      return totalPageNum;
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -48,14 +46,13 @@ export const createProduct = createAsyncThunk(
 
 export const deleteProduct = createAsyncThunk(
   "products/deleteProduct",
-  async (id, { dispatch, rejectWithValue }) => {
+  async ({ id, currentPage }, { dispatch, rejectWithValue }) => {
     try {
       const response = await api.delete(`/product/${id}`);
-      if (response.status !== 200) throw new Error(response.error);
       dispatch(
         showToastMessage({ message: "상품 삭제 완료", status: "success" })
       );
-      dispatch(getProductList({ page: 1 }));
+      dispatch(getProductList({ page: currentPage }));
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -64,11 +61,10 @@ export const deleteProduct = createAsyncThunk(
 
 export const editProduct = createAsyncThunk(
   "products/editProduct",
-  async ({ id, ...formData }, { dispatch, rejectWithValue }) => {
+  async ({ id, page, ...formData }, { dispatch, rejectWithValue }) => {
     try {
       const response = await api.put(`/product/${id}`, formData);
-      if (response.status !== 200) throw new Error(response.error);
-      dispatch(getProductList({ page: 1 }));
+      dispatch(getProductList({ page }));
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -86,6 +82,8 @@ const productSlice = createSlice({
     error: "",
     totalPageNum: 1,
     success: false,
+    // 상품 생성후, 마지막 페이지로 설정하기
+    createProductSuccess: false,
   },
   reducers: {
     setSelectedProduct: (state, action) => {
@@ -98,21 +96,30 @@ const productSlice = createSlice({
       state.error = "";
       state.success = false;
     },
+    clearCreateSuccess: (state) => {
+      state.createProductSuccess = false;
+    },
   },
   extraReducers: (builder) => {
     builder
       .addCase(createProduct.pending, (state, action) => {
         state.loading = true;
+        state.success = false; //TODO
+        state.createProductSuccess = false;
       })
       .addCase(createProduct.fulfilled, (state, action) => {
         state.loading = false;
         state.error = "";
         state.success = true; // 상품 생성을 성공했으면 다이얼로그를 닫고, 실패? 실패 메세지를 다이얼로그에 보여주고, 닫지 않음
+        state.createProductSuccess = true;
+        // TODO
+        state.totalPageNum = action.payload;
       })
       .addCase(createProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
         state.success = false;
+        state.createProductSuccess = false;
       })
       .addCase(getProductList.pending, (state, action) => {
         state.loading = true;
@@ -129,6 +136,7 @@ const productSlice = createSlice({
       })
       .addCase(editProduct.pending, (state, action) => {
         state.loading = true;
+        state.success = false;
       })
       .addCase(editProduct.fulfilled, (state, action) => {
         state.loading = false;
@@ -166,6 +174,10 @@ const productSlice = createSlice({
   },
 });
 
-export const { setSelectedProduct, setFilteredList, clearError } =
-  productSlice.actions;
+export const {
+  setSelectedProduct,
+  setFilteredList,
+  clearError,
+  clearCreateSuccess,
+} = productSlice.actions;
 export default productSlice.reducer;
