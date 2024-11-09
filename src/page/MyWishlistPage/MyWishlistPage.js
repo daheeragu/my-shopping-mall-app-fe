@@ -10,7 +10,7 @@ const MyWishlistPage = () => {
   const dispatch = useDispatch();
   const { wishlist } = useSelector((state) => state.wishlist);
   const { user } = useSelector((state) => state.user.user);
-  console.log("wishlisttttttt", wishlist);
+
   useEffect(() => {
     if (user) {
       dispatch(getWishlist()); // 로그인된 유저일 때만 위시리스트 불러오기

@@ -20,8 +20,6 @@ const ProductCard = ({ item }) => {
   // 관심 상품 체크
   const [wish, setWish] = useState(false);
 
-  console.log("wishlist", wishlist);
-  console.log("item", item);
   useEffect(() => {
     if (user && wishlist.length > 0) {
       dispatch(getWishlist()); // 로그인된 유저일 때만 위시리스트 불러오기
